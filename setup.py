@@ -42,5 +42,5 @@ setup(
 
     packages=find_packages(include=('retort',)),
 
-    install_requires=['boto3'],
+    install_requires=['boto3', 'markupsafe'],
 )
