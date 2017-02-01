@@ -7,17 +7,13 @@ Session handling objects.
 
 """
 from __future__ import absolute_import, unicode_literals
-import random
-import string
 
-
-
-VALID_KEY_CHARS = string.ascii_lowercase + string.digits
+from . import utils
 
 
 class SessionBase(object):
     """
-
+    Base class for defining managing a session.
     """
     def __init__(self, session_key=None):
         self._session_key = session_key
@@ -39,7 +35,7 @@ class SessionBase(object):
         self.modified = True
 
     def _get_new_session_key(self):
-        return ''.join(random.choice(VALID_KEY_CHARS) for _ in range(32))
+        return utils.random_string(32)
 
     def _get_or_create_session_key(self):
         if self._session_key is None:

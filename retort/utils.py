@@ -6,9 +6,10 @@ Utility functions used to perform common operations.
 
 """
 from __future__ import absolute_import, unicode_literals
-from .py2 import *
 import random
 import string
+
+from ._compat import *
 
 random = random.SystemRandom()
 
@@ -19,9 +20,11 @@ class RandomString(object):
     """
     Generate a random string
     """
-    def __init__(self, string_pool=DEFAULT_STRING_POOL, length=16):
-        self._string_pool = string_pool
-        self.length = length
+    def __init__(self, default_length=16, chars=DEFAULT_STRING_POOL):
+        self.chars = chars
+        self.length = default_length
 
     def __call__(self, length=None):
-        return ''.join(random.choice(self._string_pool) for _ in range(length or self.length))
+        return ''.join(random.choice(self.chars) for _ in range(length or self.length))
+
+random_string = RandomString()
