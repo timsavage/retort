@@ -7,7 +7,7 @@ The main application entry point and dispatching interface.
 
 Usage::
 
-    >>> handler = Application()
+    >>> handler = ApiGatewayHandler()
     >>> # Register routes with application
     >>> @handler.route("/path/to/resource")
     >>> def list_resource(request):
@@ -17,33 +17,61 @@ With the above configuration Lambda is setup to execute `my_module.handler`.
 
 """
 from __future__ import absolute_import, unicode_literals
+from ._compat import *
 
 import logging
 
-from retort.wrappers import Request, Response
+from .wrappers import Request, Response
 
-DEFAULT_METHODS = ['GET']
+HTTP_GET = 'GET'
+HTTP_PUT = 'PUT'
+HTTP_HEAD = 'HEAD'
+HTTP_POST = 'POST'
+HTTP_PATCH = 'PATCH'
+HTTP_DELETE = 'DELETE'
+HTTP_OPTIONS = 'OPTIONS'
+
+DEFAULT_METHODS = [HTTP_GET]
 
 logger = logging.getLogger(__name__)
 
 
-class Application(object):
+class ApiGatewayHandler(object):
     """
-    Main application object (emulates the Flask Application API).
+    API Gateway handler (emulates the Flask Application API).
     """
 
-    def __init__(self):
-        self.routes = {}
+    def __init__(self, return_options=True):
+        """
+        Initialise py:class:`ApiGatewayHandler`.
 
-        self._404_handler = self._default_404
+        :param return_options: Specify if server should respond to OPTIONS method.
+
+        """
+        self.return_options = return_options
+
+        self.routes = collections.defaultdict(dict)
+
+        self._404_handler = self.handle_404
+        self._405_handler = self.handle_405
         self._500_handler = None
 
     def __call__(self, event, context):
+        return self.dispatch_event(event)
+
+    def dispatch_event(self, event):
+        """
+        Dispatch an event from API Gateway.
+        """
         # Parse the incoming event
         request = Request(**event)
 
-        # Determine route function
-        route = self.routes.get(request.path, self._404_handler)
+        # Determine route handler
+        route_methods = self.routes.get(request.path)
+        if route_methods:
+            route = route_methods.get(request.method, self._405_handler)
+        else:
+            route = self._404_handler
 
         # Execute route and handle response
         try:
@@ -61,18 +89,39 @@ class Application(object):
         return response.serialize()
 
     @staticmethod
-    def _default_404(_):
+    def handle_404(_):
+        """
+        Handle the 404 (Not found) status code.
+        """
         return Response(
-            "Resource does not exist",
+            "Not Found",
             status=404,
             content_type='text/plain'
         )
+
+    def handle_405(self, request):
+        """
+        Handle the 405 (Method not allowed) status code.
+
+        This could include returning options.
+
+        """
+        if self.return_options and request.method.upper() == HTTP_OPTIONS:
+            return Response(
+                headers={'Allow': 'OPTIONS, ' + ', '.join(self.routes.get(request.path, {}))}
+            )
+        else:
+            return Response(
+                "Method Not Allowed",
+                status=405,
+                content_type='text/plain'
+            )
 
     def route(self, path, methods=DEFAULT_METHODS):
         """
         Decorator for registering a route.
 
-        >>> handler = Application()
+        >>> handler = ApiGatewayHandler()
         >>> @handler.route('/path/to/resource')
         >>> def list_resource(request):
         ...     pass
@@ -82,33 +131,39 @@ class Application(object):
 
         """
         def wrapper(f):
-            self.routes[path] = f
+            for method in methods:
+                self.routes[path][method] = f
+            return f
         return wrapper
 
-    def register_404(self):
+    def register_404(self, func=None):
         """
         Register a 404 handler.
 
-        >>> handler = Application()
-        >>> @handler.register_404('/path/to/resource')
+        >>> handler = ApiGatewayHandler()
+        >>> @handler.register_404
         >>> def handle_404(request):
         ...     return ""
 
         """
         def wrapper(f):
             self._404_handler = f
-        return wrapper
+            return f
+        return wrapper(func) if func else wrapper
 
-    def register_500(self):
+    def register_500(self, func=None):
         """
         Register a 500 handler.
 
-        >>> handler = Application()
-        >>> @handler.register_500('/path/to/resource')
+        >>> handler = ApiGatewayHandler()
+        >>> @handler.register_500
         >>> def handle_500(request, ex):
         ...     return ""
 
         """
         def wrapper(f):
             self._500_handler = f
-        return wrapper
+            return f
+        return wrapper(func) if func else wrapper
+
+Application = ApiGatewayHandler
