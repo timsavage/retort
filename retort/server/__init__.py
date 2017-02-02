@@ -11,7 +11,10 @@ from .._compat import *
 
 import importlib
 
-from werkzeug.serving import run_simple
+try:
+    from werkzeug.serving import run_simple
+except ImportError:
+    raise ImportError("The werkzeug package is required to use the runserver command.")
 
 
 STATUS_CODE_MESSAGES = {
