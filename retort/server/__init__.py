@@ -80,21 +80,23 @@ class RetortApplication(object):
         """
         Generate an API Gateway event from WSGI environ.
         """
+        request = environ['werkzeug.request']
+
         return {
-            'body': None,
-            'resource': None,
+            'body': request.data,
+            'resource': request.path,
             'requestContext': None,
-            'queryStringParameters': None,
-            'httpMethod': environ['REQUEST_METHOD'],
+            'queryStringParameters': dict(i for i in request.args.items()),
+            'httpMethod': request.method,
             'pathParameters': None,
-            'headers': {k: v for k, v in environ.items() if k.isupper()},
+            'headers': dict(i for i in request.headers.items() if i[0].isupper()),
             'stageVariables': self.stage_variables,
-            'path': environ['PATH_INFO'],
+            'path': request.path,
             'isBase64Encoded': False,
         }
 
     def handle_exception(self, exception):
-        return 'eek!'
+        pass
 
     def process_response(self, response, start_response):
         status_code = response['statusCode']
@@ -113,9 +115,11 @@ class RetortApplication(object):
         event = self.generate_event(environ)
 
         try:
-            response = self.handler(event, None)
+            response = self.handler.dispatch_event(event)
         except Exception as e:
             response = self.handle_exception(e)
+            if response is None:
+                raise
 
         return self.process_response(response, start_response)
 
@@ -124,7 +128,7 @@ class RetortApplication(object):
         return self.wsgi_app(environ, start_response)
 
 
-def run_server(handler, host=None, port=None):
+def run_server(handler, host=None, port=None, no_reload=False, use_debugger=False):
     """
 
     :param handler:
@@ -139,4 +143,5 @@ def run_server(handler, host=None, port=None):
     if port is None:
         port = 5000
 
-    run_simple(host, port, RetortApplication(handler_instance))
+    run_simple(host, port, RetortApplication(handler_instance),
+               use_reloader=not no_reload, use_debugger=use_debugger)
