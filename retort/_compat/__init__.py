@@ -8,14 +8,14 @@ provides Python 2.7 fall-backs where possible.
 This library assumes Python 2.7 if the version is less than 3.
 
 """
-from __future__ import unicode_literals
+# from __future__ import unicode_literals
 import sys
 
 __all__ = (
     'PY2', 'PY3',
     'string_types', 'integer_types', 'text_type', 'binary_type',
     'range',
-    'collections',
+    'collections', 'cookies',
 )
 
 # Version helpers
@@ -46,3 +46,12 @@ if PY3:
     import urllib
 else:
     from . import collections
+
+if PY3:
+    # http.cookies (new in Python 3.6)
+    try:
+        from http import cookies
+    except ImportError:
+        import Cookie as cookies
+else:
+    import Cookie as cookies

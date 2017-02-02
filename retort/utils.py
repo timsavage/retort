@@ -6,11 +6,12 @@ Utility functions used to perform common operations.
 
 """
 from __future__ import absolute_import, unicode_literals
-import random
-import string
-
 from ._compat import *
 
+import string
+
+# Replace random with System random (derived from urandom)
+import random
 random = random.SystemRandom()
 
 DEFAULT_STRING_POOL = string.ascii_letters + string.digits + "-_"

@@ -6,10 +6,8 @@ Wrappers
 Wrappers around the request and response context.
 
 """
-from __future__ import unicode_literals
-import Cookie
-
-from retort.data_structures import ChainMap
+from __future__ import absolute_import, unicode_literals
+from ._compat import *
 
 
 class BaseRequest(object):
@@ -28,7 +26,7 @@ class BaseRequest(object):
         self.stage_variables = stageVariables or {}
         self.path = path
 
-        self.params = ChainMap(stageVariables, pathParameters, queryStringParameters, headers)
+        self.params = collections.ChainMap(stageVariables, pathParameters, queryStringParameters, headers)
 
 
 class Request(BaseRequest):
@@ -66,7 +64,7 @@ class BaseResponse(object):
             self.status_code = status
         self.headers = headers or {}
         self.headers['Content-Type'] = content_type
-        self.cookies = Cookie.SimpleCookie()
+        self.cookies = cookies.SimpleCookie()
 
     def serialize(self):
         response_headers = self.headers.copy()
