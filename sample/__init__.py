@@ -1,7 +1,6 @@
-from retort.app import Application
-from retort.wrappers import Response
+from retort import ApiGatewayHandler, Response
 
-handler = Application()
+handler = ApiGatewayHandler()
 
 
 @handler.route('/hello/')
