@@ -14,3 +14,5 @@ from __future__ import absolute_import, unicode_literals
 from .app import Application
 from .helpers import redirect
 from .wrappers import Request, Response
+
+__version__ = '0.1'
