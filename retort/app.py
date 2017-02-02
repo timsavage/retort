@@ -54,12 +54,14 @@ class Application(object):
             else:
                 raise  # Send it up to Lambda to handle
 
+        # If None is returned default to No Content
         if response is None:
-            response = Response(status=201)
+            response = Response(status=204)
 
         return response.serialize()
 
-    def _default_404(self, request):
+    @staticmethod
+    def _default_404(_):
         return Response(
             "Resource does not exist",
             status=404,
