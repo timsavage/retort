@@ -37,10 +37,12 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-
     keywords='python web framework lambda aws api-gateway',
 
     packages=find_packages(include=('retort',)),
 
     install_requires=['boto3', 'markupsafe'],
+    extras_require={
+        'development': ['werkzeug']
+    },
 )
