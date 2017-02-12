@@ -99,6 +99,13 @@ class RetortApplication(object):
         pass
 
     def process_response(self, response, start_response):
+        """
+        Process response object into a WSGI response.
+
+        :type response: retort.Response
+        :param start_response:
+        :return:
+        """
         status_code = response['statusCode']
         status = "{} {}".format(status_code, STATUS_CODE_MESSAGES.get(status_code, 'UNKNOWN'))
         headers = [i for i in response['headers'].items()]

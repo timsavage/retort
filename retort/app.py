@@ -40,6 +40,21 @@ class ApiGatewayHandler(object):
     """
     API Gateway handler (emulates the Flask Application API).
     """
+    @staticmethod
+    def _default_404(_):
+        return Response(
+            "Resource does not exist.",
+            status=404,
+            content_type='text/plain'
+        )
+
+    @staticmethod
+    def _default_405(_):
+        return Response(
+            "Method not allowed.",
+            status=405,
+            content_type='text/plain'
+        )
 
     def __init__(self, return_options=True):
         """
@@ -143,11 +158,26 @@ class ApiGatewayHandler(object):
         >>> handler = ApiGatewayHandler()
         >>> @handler.register_404
         >>> def handle_404(request):
-        ...     return ""
+        ...     return Response()
 
         """
         def wrapper(f):
             self._404_handler = f
+            return f
+        return wrapper(func) if func else wrapper
+
+    def register_405(self, func=None):
+        """
+        Register a 405 handler.
+
+        >>> handler = ApiGatewayHandler()
+        >>> @handler.register_405
+        >>> def handle_405(request):
+        ...     return Response()
+
+        """
+        def wrapper(f):
+            self._405_handler = f
             return f
         return wrapper(func) if func else wrapper
 
@@ -158,7 +188,7 @@ class ApiGatewayHandler(object):
         >>> handler = ApiGatewayHandler()
         >>> @handler.register_500
         >>> def handle_500(request, ex):
-        ...     return ""
+        ...     return Response()
 
         """
         def wrapper(f):

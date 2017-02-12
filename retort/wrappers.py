@@ -55,20 +55,20 @@ class BaseResponse(object):
 
     """
     status_code = 200
-
-    content_type = 'text/html'
+    default_mimetype = 'text/plain'
 
     def __init__(self, body='', status=None, content_type=None, headers=None):
         self.body = body
         if status is not None:
             self.status_code = status
         self.headers = headers or {}
-        self.headers['Content-Type'] = content_type
+        self.headers['Content-Type'] = content_type or self.default_mimetype
         self.cookies = cookies.SimpleCookie()
 
     def serialize(self):
         response_headers = self.headers.copy()
 
+        # Generate set-cookie headers
         for header, c in zip(COOKIE_HEAP, self.cookies.values()):
             response_headers[header] = str(c.output(header=''))
 
@@ -94,4 +94,4 @@ class BaseResponse(object):
 
 
 class Response(BaseResponse):
-    pass
+    default_mimetype = 'text/html'
