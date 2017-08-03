@@ -6,8 +6,13 @@ Wrappers
 Wrappers around the request and response context.
 
 """
-from __future__ import absolute_import, unicode_literals
-from ._compat import *
+from collections import ChainMap
+
+try:
+    # http.cookies (new in Python 3.6)
+    from http import cookies
+except ImportError:
+    import Cookie as cookies
 
 
 class BaseRequest(object):
@@ -26,7 +31,7 @@ class BaseRequest(object):
         self.stage_variables = stageVariables or {}
         self.path = path
 
-        self.params = collections.ChainMap(stageVariables, pathParameters, queryStringParameters, headers)
+        self.params = ChainMap(stageVariables, pathParameters, queryStringParameters, headers)
 
 
 class Request(BaseRequest):

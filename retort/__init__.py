@@ -9,8 +9,6 @@ Retort
 A web framework for building applications with AWS Lambda and API Gateway inspired by Flask and Bottle.
 
 """
-from __future__ import absolute_import, unicode_literals
-
 from .app import ApiGatewayHandler
 from .helpers import redirect
 from .wrappers import Request, Response

@@ -16,10 +16,9 @@ Usage::
 With the above configuration Lambda is setup to execute `my_module.handler`.
 
 """
-from __future__ import absolute_import, unicode_literals
-from ._compat import *
-
 import logging
+
+from collections import defaultdict
 
 from .wrappers import Request, Response
 
@@ -65,7 +64,7 @@ class ApiGatewayHandler(object):
         """
         self.return_options = return_options
 
-        self.routes = collections.defaultdict(dict)
+        self.routes = defaultdict(dict)
 
         self._404_handler = self.handle_404
         self._405_handler = self.handle_405

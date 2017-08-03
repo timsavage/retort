@@ -6,8 +6,6 @@ CLI
 Retort contains a CLI for common functions
 
 """
-from __future__ import absolute_import, unicode_literals
-
 import argparse
 
 import retort

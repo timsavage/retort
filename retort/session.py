@@ -6,8 +6,6 @@ Session
 Session handling objects.
 
 """
-from __future__ import absolute_import, unicode_literals
-
 from . import utils
 
 
@@ -35,7 +33,7 @@ class SessionBase(object):
         self.modified = True
 
     def _get_new_session_key(self):
-        return utils.random_string(32)
+        return utils.token(128)
 
     def _get_or_create_session_key(self):
         if self._session_key is None:

@@ -6,13 +6,11 @@ Server
 This is a builtin development server that simulates requests from API Gateway.
 
 """
-from __future__ import absolute_import, unicode_literals
-from .._compat import *
-
 import importlib
 
 try:
     from werkzeug.serving import run_simple
+    from werkzeug.wrappers import Request
 except ImportError:
     raise ImportError("The werkzeug package is required to use the runserver command.")
 
@@ -80,7 +78,7 @@ class RetortApplication(object):
         """
         Generate an API Gateway event from WSGI environ.
         """
-        request = environ['werkzeug.request']
+        request = Request(environ)
 
         return {
             'body': request.data,
@@ -111,7 +109,7 @@ class RetortApplication(object):
         headers = [i for i in response['headers'].items()]
 
         body = response['body']
-        if isinstance(body, text_type):
+        if isinstance(body, str):
             body = body.encode('utf8')
 
         # Do WSGI response
