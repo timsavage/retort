@@ -35,7 +35,7 @@ DEFAULT_METHODS = [HTTP_GET]
 logger = logging.getLogger(__name__)
 
 
-class ApiGatewayHandler(object):
+class ApiGatewayHandler:
     """
     API Gateway handler (emulates the Flask Application API).
     """

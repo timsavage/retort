@@ -69,7 +69,7 @@ def import_handler(handler):
     return module, getattr(module, instance_name)
 
 
-class RetortApplication(object):
+class RetortApplication:
     def __init__(self, handler, stage_variables=None):
         self.handler = handler
         self.stage_variables = stage_variables or {}
@@ -133,13 +133,9 @@ class RetortApplication(object):
         return self.wsgi_app(environ, start_response)
 
 
-def run_server(handler, host=None, port=None, no_reload=False, use_debugger=False):
+def run_server(handler, host: str=None, port: int=None, no_reload: bool=False, use_debugger: bool=False):
     """
-
-    :param handler:
-    :param host:
-    :param port:
-    :return:
+    Start running a development server.
     """
     handler_module, handler_instance = import_handler(handler)
 

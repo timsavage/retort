@@ -9,19 +9,19 @@ Session handling objects.
 from . import utils
 
 
-class SessionBase(object):
+class SessionBase:
     """
     Base class for defining managing a session.
     """
-    def __init__(self, session_key=None):
+    def __init__(self, session_key: str=None):
         self._session_key = session_key
         self.accessed = False
         self.modified = False
 
-    def __contains__(self, key):
+    def __contains__(self, key: str) -> bool:
         return key in self._session
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str):
         return self._session[key]
 
     def __setitem__(self, key, value):

@@ -15,7 +15,7 @@ except ImportError:
     import Cookie as cookies
 
 
-class BaseRequest(object):
+class BaseRequest:
     """
     Context object for a request event from an API Gateway configured as a Proxy.
     """
@@ -49,7 +49,7 @@ COOKIE_HEAP = (
 )
 
 
-class BaseResponse(object):
+class BaseResponse:
     """
     Generate a response for API Gateway proxy
 
